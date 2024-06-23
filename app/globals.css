@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #171717; /* Changed this to dark color scheme */
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-synthesis: none;
+  font-family: var(--font-rem); /* Ensure that --font-rem is defined somewhere */
+}
+
+.font-it {
+  font-family: var(--font-rem-italic); /* Ensure that --font-rem-italic is defined somewhere */
+}
+
+.navlink:hover > ul {
+  display: flex;
+  animation: linkMenu 0.3s forwards;
+}
+
+.linkmenu:hover > *:after {
+  width: 100%;
+}
+
+.searchbar {
+  animation: linkMenu 0.3s forwards;
+}
+
+@keyframes linkMenu {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.buttonNav:hover > * {
+  border-radius: 40px;
+  background: transparent;
+  color: white;
+}
+
+.buttonBg:hover > div {
+  background: transparent;
+}
