@@ -12,7 +12,7 @@ body {
   background: var(--background);
   font-synthesis: none;
   font-family: var(
-    --font-rem
+    --font-baloo
   ); /* Ensure that --font-rem is defined somewhere */
 }
 

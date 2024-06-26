@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { motion as m, AnimatePresence } from "framer-motion";
 import CheckPrimaryBtn from "../CheckPrimaryBtn";
 import CheckSecondaryBtn from "../CheckSecondaryBtn";
@@ -8,21 +8,31 @@ import { Input, DatePicker, Tooltip, DateInput } from "@nextui-org/react";
 import { parseDate } from "@internationalized/date";
 import { CalendarDate } from "@internationalized/date";
 export default function sFormCandidate() {
-  const btss = [
-    { sigle: "SIO", tooltip: "Services Informatiques aux Organisations" },
+  const btss: { sigle: string; tooltip: string; id: number }[] = [
+    {
+      sigle: "SIO",
+      tooltip: "Services Informatiques aux Organisations",
+      id: 1,
+    },
     {
       sigle: "NDRC",
       tooltip: "Négociation et Digitalisation de la Relation Client",
+      id: 2,
     },
-    { sigle: "MCO", tooltip: "Management Commercial Opérationnel" },
-    { sigle: "GPME", tooltip: "Gestion de Petites et Moyennes Entreprises" },
+    { sigle: "MCO", tooltip: "Management Commercial Opérationnel", id: 3 },
+    {
+      sigle: "GPME",
+      tooltip: "Gestion de Petites et Moyennes Entreprises",
+      id: 4,
+    },
   ];
-  const bachelors: { sigle: string; tooltip: string }[] = [
-    { sigle: "CS", tooltip: "Cyber-sécurité" },
-    { sigle: "DCG", tooltip: "Diplôme de comptabilité et de gestion" },
+  const bachelors: { sigle: string; tooltip: string; id: number }[] = [
+    { sigle: "CS", tooltip: "Cyber-sécurité", id: 5 },
+    { sigle: "DCG", tooltip: "Diplôme de comptabilité et de gestion", id: 6 },
     {
       sigle: "CMO",
       tooltip: "Commerce et Marketing Opérationnel",
+      id: 7,
     },
   ];
   const context = useContext(CandidatureContext);
@@ -52,14 +62,16 @@ export default function sFormCandidate() {
     return date ? parseDate(date).toString() : "";
   };
   const [validEmail, setValidEmail] = useState(false);
-
+  useEffect(() => {
+    console.log(formData.known);
+  }, [formData.known]);
   return (
     <form className="h-full">
       <AnimatePresence mode="wait">
         <div key={step} className="h-full">
           {step === 1 && (
             <m.div
-              initial={{ opacity: 0, x: 100 }}
+              initial={{ opacity: 0, x: 99 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ type: "just" }}
@@ -67,20 +79,74 @@ export default function sFormCandidate() {
             >
               <div className="flex justify-center items-center gap-10 flex-col h-full">
                 <h2 className="text-black text-xl">Je candidate pour :</h2>
-                <div className="space-x-8">
-                  <CheckPrimaryBtn
-                    label="BTS"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setFormData((prevFormData) => ({
-                        ...prevFormData,
-                        cursus: 1,
-                        formation: null,
-                      }));
-                    }}
-                    active={formData.cursus === 1}
-                  />
-                  <CheckPrimaryBtn
+                <div className="space-y-8">
+                  <div className="flex flex-col gap-2 items-center">
+                    <h1 className="text-xl font-medium text-blue-i">BTS</h1>
+                    <div className="flex gap-4">
+                      {btss.map((value, index) => (
+                        <CheckSecondaryBtn
+                          key={value.sigle}
+                          label={value.sigle}
+                          tooltip={value.tooltip}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const isPresent = formData.formation.some(
+                              (item) => item.id === value.id
+                            );
+                            setFormData((prevFormData) => ({
+                              ...prevFormData,
+                              formation: isPresent
+                                ? prevFormData.formation.filter(
+                                    (item) => item.id !== value.id
+                                  )
+                                : [
+                                    ...prevFormData.formation,
+                                    { sigle: value.sigle, id: value.id },
+                                  ],
+                            }));
+                          }}
+                          active={formData.formation.some(
+                            (item) => item.id === value.id
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 items-center">
+                    <h1 className="text-xl font-medium text-blue-i">
+                      Bachelors
+                    </h1>
+                    <div className="flex gap-4">
+                      {bachelors.map((value, index) => (
+                        <CheckSecondaryBtn
+                          key={value.sigle}
+                          label={value.sigle}
+                          tooltip={value.tooltip}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const isPresent = formData.formation.some(
+                              (item) => item.id === value.id
+                            );
+                            setFormData((prevFormData) => ({
+                              ...prevFormData,
+                              formation: isPresent
+                                ? prevFormData.formation.filter(
+                                    (item) => item.id !== value.id
+                                  )
+                                : [
+                                    ...prevFormData.formation,
+                                    { sigle: value.sigle, id: value.id },
+                                  ],
+                            }));
+                          }}
+                          active={formData.formation.some(
+                            (item) => item.id === value.id
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  {/* <CheckPrimaryBtn
                     label="Bachelor"
                     onClick={(e) => {
                       e.preventDefault();
@@ -91,99 +157,120 @@ export default function sFormCandidate() {
                       }));
                     }}
                     active={formData.cursus === 2}
-                  />
-                </div>
-                <div className="flex gap-4">
-                  {formData.cursus &&
-                    (formData.cursus == 1
-                      ? btss.map((value, index) => (
-                          <CheckSecondaryBtn
-                            key={index}
-                            label={value.sigle}
-                            tooltip={value.tooltip}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              if (formData.formation == null) {
-                                setFormData((prevFormData) => ({
-                                  ...prevFormData,
-                                  formation: index,
-                                }));
-                              } else {
-                                setFormData((prevFormData) => ({
-                                  ...prevFormData,
-                                  formation: null,
-                                }));
-                              }
-                            }}
-                            active={formData.formation === index}
-                          />
-                        ))
-                      : bachelors.map((value, index) => (
-                          <CheckSecondaryBtn
-                            key={index}
-                            label={value.sigle}
-                            tooltip={value.tooltip}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              if (formData.formation == null) {
-                                setFormData((prevFormData) => ({
-                                  ...prevFormData,
-                                  formation: index,
-                                }));
-                              } else {
-                                setFormData((prevFormData) => ({
-                                  ...prevFormData,
-                                  formation: null,
-                                }));
-                              }
-                            }}
-                            active={formData.formation === index}
-                          />
-                        )))}
+                  /> */}
                 </div>
               </div>
             </m.div>
           )}
-
-          {step === 2 && (
+          {step === 3 && (
             <m.div
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ type: "just" }}
-              className="h-full"
+              className="h-full flex flex-col justify-center items-center w-full gap-10"
             >
-              <div className="flex justify-center items-center gap-10 flex-col h-full">
-                <h2 className="text-black text-xl">Je candidate pour :</h2>
-                <div className="space-x-8">
-                  <CheckPrimaryBtn
-                    label="Initial"
+              <h1>Derniere formation suivie ou cursus en cours</h1>
+              <div className="w-full  grid grid-cols-2 gap-2 h-fit">
+                <Input
+                  label="Etablissement d'origine"
+                  className="col-span-2"
+                  value={formData.prevFormation?.Etablissement}
+                  onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    // @ts-ignore
+                    setFormData((prevFormData) => ({
+                      ...prevFormData,
+                      prevFormation: {
+                        ...prevFormData.prevFormation,
+                        Etablissement: e.target.value,
+                      },
+                    }));
+                  }}
+                />
+                <Input
+                  label="Ville"
+                  value={formData.prevFormation?.Ville}
+                  onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    // @ts-ignore
+                    setFormData((prevFormData) => ({
+                      ...prevFormData,
+                      prevFormation: {
+                        ...prevFormData.prevFormation,
+                        Ville: e.target.value,
+                      },
+                    }));
+                  }}
+                />
+                <Input
+                  label="Code Postal"
+                  value={formData.prevFormation?.CodePostal}
+                  onInput={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    // @ts-ignore
+                    setFormData((prevFormData) => ({
+                      ...prevFormData,
+                      prevFormation: {
+                        ...prevFormData.prevFormation,
+                        CodePostal: e.target.value,
+                      },
+                    }));
+                  }}
+                />
+              </div>
+            </m.div>
+          )}
+          {step === 4 && (
+            <m.div
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ type: "just" }}
+              className="h-full flex flex-col justify-center items-center w-full gap-10"
+            >
+              <h1>J'ai connu l'iscio grace à :</h1>
+              <div className="flex gap-x-4 px-2 flex-wrap justify-center items-center   ">
+                {[
+                  "Bouche à oreille",
+                  "Réseaux sociaux",
+                  "Parcoursup",
+
+                  "Salon/Forum",
+                  "Entourage",
+                  "Autre",
+                ].map((value, index) => (
+                  <CheckSecondaryBtn
+                    key={value}
+                    label={value}
                     onClick={(e) => {
                       e.preventDefault();
                       setFormData((prevFormData) => ({
                         ...prevFormData,
-                        alternance: false,
+                        known: value,
                       }));
                     }}
-                    active={formData.alternance === false}
+                    active={formData.known === value}
                   />
-                  <CheckPrimaryBtn
-                    label="Alternance"
-                    onClick={(e) => {
-                      e.preventDefault();
+                ))}
+              </div>
+              <div className="w-full flex justify-end">
+                <label htmlFor="verif" className="flex gap-2 text-blue-i">
+                  J'accepte que l'ISCIO conserve et utilise mes données.
+                  <input
+                    type="checkbox"
+                    onClick={() => {
                       setFormData((prevFormData) => ({
                         ...prevFormData,
-                        alternance: true,
+                        allowed: !prevFormData.allowed,
                       }));
                     }}
-                    active={formData.alternance === true}
+                    name=""
+                    id="verif"
                   />
-                </div>
+                </label>
               </div>
             </m.div>
           )}
 
-          {step === 3 && (
+          {step === 2 && (
             <m.div
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
@@ -256,6 +343,7 @@ export default function sFormCandidate() {
                     segment: "text-gray-500",
                   }}
                   onChange={(date) => {
+                    if (!date) return;
                     setFormData((prevFormData) => ({
                       ...prevFormData,
                       birthdate: date.toString(),

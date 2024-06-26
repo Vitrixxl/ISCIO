@@ -16,7 +16,7 @@ export default function CheckPrimaryBtn({
     <m.button
       whileTap={{ scale: 0.95, transition: { duration: 0.01 } }}
       onClick={onClick}
-      className="bg-gradient-to-tr from-blue-i to-green-i p-0.5 rounded-md text-blue-i hover:text-white transition-all duration-100 min-w-24 buttonBg"
+      className="bg-gradient-to-tr from-blue-i to-green-i p-0.5 rounded-md text-blue-i hover:text-white transition-all w-fit duration-100 min-w-24 buttonBg"
     >
       <div
         className={
